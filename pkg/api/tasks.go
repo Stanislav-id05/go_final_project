@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/Stanislav-id05/go_final_project/pkg/constants"
 	"github.com/Stanislav-id05/go_final_project/pkg/db"
 )
 
@@ -12,7 +13,7 @@ type TasksResp struct {
 }
 
 func tasksHandler(w http.ResponseWriter, r *http.Request) {
-	tasks, err := db.Tasks(50) // запросим максимум 50 задач
+	tasks, err := db.Tasks(constants.TasksLimit) // запросим максимум 50 задач
 	if err != nil {
 		writeJsonError(w, err) // функция, которая возвращает ошибку в JSON
 		return

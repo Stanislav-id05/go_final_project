@@ -3,7 +3,6 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"log"
 )
 
 type Task struct {
@@ -16,20 +15,8 @@ type Task struct {
 
 func AddTask(task *Task) (int64, error) {
 
-	dbFile := "scheduler.db"
-
-	// Инициализация базы данных
-	err := Init(dbFile)
-	if err != nil {
-		log.Fatalf("Ошибка инициализации базы данных: %v", err)
-	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			log.Fatalf("Ошибка закрытия базы данных: %v", err)
-		}
-	}()
-
-	fmt.Println("База данных успешно инициализирована!")
+	Init("scheduler.db")
+	defer db.Close()
 
 	var id int64
 	query := `INSERT INTO scheduler (date, title, comment, repeat) VALUES (?, ?, ?, ?)`
@@ -42,20 +29,8 @@ func AddTask(task *Task) (int64, error) {
 
 func Tasks(limit int) ([]*Task, error) {
 
-	dbFile := "scheduler.db"
-
-	// Инициализация базы данных
-	err := Init(dbFile)
-	if err != nil {
-		log.Fatalf("Ошибка инициализации базы данных: %v", err)
-	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			log.Fatalf("Ошибка закрытия базы данных: %v", err)
-		}
-	}()
-
-	fmt.Println("База данных успешно инициализирована!")
+	Init("scheduler.db")
+	defer db.Close()
 
 	rows, err := db.Query("SELECT id, date, title, comment, repeat FROM scheduler ORDER BY date ASC LIMIT ?", limit)
 	if err != nil {
@@ -83,24 +58,12 @@ func Tasks(limit int) ([]*Task, error) {
 
 func GetTask(id string) (*Task, error) {
 
-	dbFile := "scheduler.db"
-
-	// Инициализация базы данных
-	err := Init(dbFile)
-	if err != nil {
-		log.Fatalf("Ошибка инициализации базы данных: %v", err)
-	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			log.Fatalf("Ошибка закрытия базы данных: %v", err)
-		}
-	}()
-
-	fmt.Println("База данных успешно инициализирована!")
+	Init("scheduler.db")
+	defer db.Close()
 
 	var task Task
 	query := `SELECT id, date, title, comment, repeat FROM scheduler WHERE id = ?`
-	err = db.QueryRow(query, id).Scan(&task.ID, &task.Date, &task.Title, &task.Comment, &task.Repeat)
+	err := db.QueryRow(query, id).Scan(&task.ID, &task.Date, &task.Title, &task.Comment, &task.Repeat)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("task not found")
@@ -112,20 +75,8 @@ func GetTask(id string) (*Task, error) {
 
 func UpdateTask(task *Task) error {
 
-	dbFile := "scheduler.db"
-
-	// Инициализация базы данных
-	err := Init(dbFile)
-	if err != nil {
-		log.Fatalf("Ошибка инициализации базы данных: %v", err)
-	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			log.Fatalf("Ошибка закрытия базы данных: %v", err)
-		}
-	}()
-
-	fmt.Println("База данных успешно инициализирована!")
+	Init("scheduler.db")
+	defer db.Close()
 
 	query := `UPDATE scheduler SET date = ?, title = ?, comment = ?, repeat = ? WHERE id = ?`
 	res, err := db.Exec(query, task.Date, task.Title, task.Comment, task.Repeat, task.ID)
@@ -146,19 +97,8 @@ func UpdateTask(task *Task) error {
 
 func DeleteTask(id string) error {
 
-	dbFile := "scheduler.db"
-	// Инициализация базы данных
-	err := Init(dbFile)
-	if err != nil {
-		log.Fatalf("Ошибка инициализации базы данных: %v", err)
-	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			log.Fatalf("Ошибка закрытия базы данных: %v", err)
-		}
-	}()
-
-	fmt.Println("База данных успешно инициализирована!")
+	Init("scheduler.db")
+	defer db.Close()
 
 	// Проверяем, что id не пустой
 	if id == "" {
@@ -182,28 +122,4 @@ func DeleteTask(id string) error {
 	}
 
 	return nil // Успешное удаление
-}
-
-func UpdateDate(next string, id string) error {
-
-	dbFile := "scheduler.db"
-	// Инициализация базы данных
-	err := Init(dbFile)
-	if err != nil {
-		log.Fatalf("Ошибка инициализации базы данных: %v", err)
-	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			log.Fatalf("Ошибка закрытия базы данных: %v", err)
-		}
-	}()
-
-	fmt.Println("База данных успешно инициализирована!")
-
-	query := "UPDATE tasks SET date = ? WHERE id = ?"
-	_, err = db.Exec(query, next, id)
-	if err != nil {
-		return fmt.Errorf("failed to update task date: %w", err)
-	}
-	return nil
 }

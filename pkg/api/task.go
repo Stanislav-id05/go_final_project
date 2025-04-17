@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Stanislav-id05/go_final_project/pkg/constants"
 	"github.com/Stanislav-id05/go_final_project/pkg/db"
 )
 
@@ -49,7 +50,7 @@ func UpdateTaskHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	now := time.Now().Truncate(24 * time.Hour)
-	if parsedDate, err := time.Parse("20060102", task.Date); err != nil || parsedDate.Before(now) {
+	if parsedDate, err := time.Parse(constants.DateFormat, task.Date); err != nil || parsedDate.Before(now) {
 		writJson(w, http.StatusBadRequest, map[string]string{"error": "Дата не может быть в прошлом"})
 		return
 	}
@@ -63,7 +64,7 @@ func UpdateTaskHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func isValidDate(dateStr string) bool {
-	_, err := time.Parse("20060102", dateStr)
+	_, err := time.Parse(constants.DateFormat, dateStr)
 	return err == nil
 }
 

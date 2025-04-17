@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/Stanislav-id05/go_final_project/pkg/constants"
 	"github.com/Stanislav-id05/go_final_project/pkg/db"
 )
 
@@ -29,7 +30,7 @@ func TaskDone(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if task.Repeat != "" {
-		if currentDate, err := time.Parse("20060102", task.Date); err == nil {
+		if currentDate, err := time.Parse(constants.DateFormat, task.Date); err == nil {
 			if nextDate, err := NextDate(currentDate, task.Date, task.Repeat); err == nil {
 				task.Date = nextDate
 			} else {
@@ -43,9 +44,6 @@ func TaskDone(w http.ResponseWriter, r *http.Request) {
 	} else if err = db.DeleteTask(idGet); err != nil {
 		http.Error(w, `{"error":"Удаление невозможно"}`, http.StatusInternalServerError)
 		return
-	} else {
-		w.Write([]byte("{}"))
-		return
 	}
 
 	if err = db.UpdateTask(task); err != nil {
@@ -53,5 +51,8 @@ func TaskDone(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write([]byte("{}"))
+	if _, err := w.Write([]byte("{}")); err != nil {
+		http.Error(w, `{"error":"Ошибка при записи ответа"}`, http.StatusInternalServerError)
+		return
+	}
 }

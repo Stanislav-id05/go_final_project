@@ -1,9 +1,10 @@
 package main
 
 import (
+	"log"
+
 	"go1f/pkg/db"
 	"go1f/pkg/server"
-	"log"
 
 	"github.com/Stanislav-id05/go_final_project/pkg/api"
 )

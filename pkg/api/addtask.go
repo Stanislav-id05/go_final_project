@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Stanislav-id05/go_final_project/pkg/constants"
 	"github.com/Stanislav-id05/go_final_project/pkg/db"
 )
 
@@ -49,17 +50,17 @@ func checkDate(task *db.Task) error {
 	now := time.Now().Truncate(24 * time.Hour)
 	var err error
 	if task.Date == "" {
-		task.Date = now.Format("20060102")
+		task.Date = now.Format(constants.DateFormat)
 	}
 
-	t, err := time.Parse("20060102", task.Date)
+	t, err := time.Parse(constants.DateFormat, task.Date)
 	if err != nil {
 		return err
 	}
 
 	if afterNow(now, t) {
 		if len(task.Repeat) == 0 {
-			task.Date = now.Format("20060102")
+			task.Date = now.Format(constants.DateFormat)
 		} else {
 			next, err := NextDate(now, task.Date, task.Repeat)
 			if err != nil {

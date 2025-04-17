@@ -3,6 +3,8 @@ package api
 import (
 	"net/http"
 	"time"
+
+	"github.com/Stanislav-id05/go_final_project/pkg/constants"
 )
 
 func Init() {
@@ -23,7 +25,7 @@ func nextDateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	now, err := time.Parse("20060102", nowStr)
+	now, err := time.Parse(constants.DateFormat, nowStr)
 	if err != nil {
 		http.Error(w, "некорректная дата", http.StatusBadRequest)
 		return
@@ -44,9 +46,7 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
 		addTaskHandler(w, r)
-		//addTaskHandler(w, r)
 	case http.MethodGet:
-		//tasksHandler(w, r)
 		GetTaskHandler(w, r)
 	case http.MethodPut:
 		UpdateTaskHandler(w, r)

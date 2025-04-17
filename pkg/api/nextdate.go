@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/Stanislav-id05/go_final_project/pkg/constants"
 )
 
 func NextDate(now time.Time, date string, repeat string) (string, error) {
@@ -13,7 +15,7 @@ func NextDate(now time.Time, date string, repeat string) (string, error) {
 		return "", errors.New("пустая строка в колонке repeat")
 	}
 	// Парсинг исходной даты
-	startDate, err := time.Parse("20060102", date)
+	startDate, err := time.Parse(constants.DateFormat, date)
 	if err != nil {
 		return "", errors.New("некорректный формат даты")
 	}
@@ -36,7 +38,7 @@ func NextDate(now time.Time, date string, repeat string) (string, error) {
 		for nextDate.Before(now) || nextDate.Equal(now) {
 			nextDate = nextDate.AddDate(0, 0, days)
 		}
-		return nextDate.Format("20060102"), nil
+		return nextDate.Format(constants.DateFormat), nil
 
 	case "y":
 		nextDate = startDate.AddDate(1, 0, 0)
@@ -44,7 +46,7 @@ func NextDate(now time.Time, date string, repeat string) (string, error) {
 		for nextDate.Before(now) || nextDate.Equal(now) {
 			nextDate = nextDate.AddDate(1, 0, 0)
 		}
-		return nextDate.Format("20060102"), nil
+		return nextDate.Format(constants.DateFormat), nil
 
 	default:
 		return "", errors.New("неподдерживаемый формат")
