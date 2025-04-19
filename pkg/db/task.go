@@ -13,10 +13,15 @@ type Task struct {
 	Repeat  string `json:"repeat"`
 }
 
-func AddTask(task *Task) (int64, error) {
+type Storage struct {
+	db *sql.DB
+}
 
-	Init("scheduler.db")
-	defer db.Close()
+func NewStorage(db *sql.DB) *Storage {
+	return &Storage{db: db}
+}
+
+func (s *Storage) AddTask(task *Task) (int64, error) {
 
 	var id int64
 	query := `INSERT INTO scheduler (date, title, comment, repeat) VALUES (?, ?, ?, ?)`
@@ -27,10 +32,7 @@ func AddTask(task *Task) (int64, error) {
 	return id, err
 }
 
-func Tasks(limit int) ([]*Task, error) {
-
-	Init("scheduler.db")
-	defer db.Close()
+func (s *Storage) Tasks(limit int) ([]*Task, error) {
 
 	rows, err := db.Query("SELECT id, date, title, comment, repeat FROM scheduler ORDER BY date ASC LIMIT ?", limit)
 	if err != nil {
@@ -56,10 +58,7 @@ func Tasks(limit int) ([]*Task, error) {
 	return tasks, nil
 }
 
-func GetTask(id string) (*Task, error) {
-
-	Init("scheduler.db")
-	defer db.Close()
+func (s *Storage) GetTask(id string) (*Task, error) {
 
 	var task Task
 	query := `SELECT id, date, title, comment, repeat FROM scheduler WHERE id = ?`
@@ -73,10 +72,7 @@ func GetTask(id string) (*Task, error) {
 	return &task, nil
 }
 
-func UpdateTask(task *Task) error {
-
-	Init("scheduler.db")
-	defer db.Close()
+func (s *Storage) UpdateTask(task *Task) error {
 
 	query := `UPDATE scheduler SET date = ?, title = ?, comment = ?, repeat = ? WHERE id = ?`
 	res, err := db.Exec(query, task.Date, task.Title, task.Comment, task.Repeat, task.ID)
@@ -95,10 +91,7 @@ func UpdateTask(task *Task) error {
 	return nil
 }
 
-func DeleteTask(id string) error {
-
-	Init("scheduler.db")
-	defer db.Close()
+func (s *Storage) DeleteTask(id string) error {
 
 	// Проверяем, что id не пустой
 	if id == "" {

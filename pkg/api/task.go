@@ -10,13 +10,16 @@ import (
 )
 
 func GetTaskHandler(w http.ResponseWriter, r *http.Request) {
+
+	var store db.Storage
+
 	id := r.URL.Query().Get("id")
 	if id == "" {
 		writJson(w, http.StatusBadRequest, map[string]string{"error": "Не указан идентификатор"})
 		return
 	}
 
-	task, err := db.GetTask(id)
+	task, err := store.GetTask(id)
 	if err != nil {
 		writJson(w, http.StatusNotFound, map[string]string{"error": "Задача не найдена"})
 		return
@@ -33,6 +36,7 @@ func writJson(w http.ResponseWriter, status int, data interface{}) {
 }
 
 func UpdateTaskHandler(w http.ResponseWriter, r *http.Request) {
+	var store db.Storage
 	var task db.Task
 	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
 		writJson(w, http.StatusBadRequest, map[string]string{"error": "Некорректные данные"})
@@ -55,7 +59,7 @@ func UpdateTaskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := db.UpdateTask(&task); err != nil {
+	if err := store.UpdateTask(&task); err != nil {
 		writJson(w, http.StatusNotFound, map[string]string{"error": "Задача не найдена"})
 		return
 	}
@@ -69,13 +73,14 @@ func isValidDate(dateStr string) bool {
 }
 
 func deleteTask(w http.ResponseWriter, r *http.Request) {
+	var store db.Storage
 	id := r.URL.Query().Get("id")
 	if id == "" {
 		http.Error(w, `{"error":"missing id"}`, http.StatusBadRequest)
 		return
 	}
 
-	err := db.DeleteTask(id)
+	err := store.DeleteTask(id)
 	if err != nil {
 		http.Error(w, `{"error":"failed to delete task"}`, http.StatusInternalServerError)
 		return

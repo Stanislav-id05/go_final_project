@@ -10,8 +10,9 @@ import (
 )
 
 func addTaskHandler(w http.ResponseWriter, r *http.Request) {
-	var task db.Task
 
+	var task db.Task
+	var store db.Storage
 	// Десериализация JSON
 	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
 		vriteJson(w, map[string]string{"error": "Invalid request payload"})
@@ -31,7 +32,7 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Добавление задачи в базу данных
-	id, err := db.AddTask(&task)
+	id, err := store.AddTask(&task)
 	if err != nil {
 		vriteJson(w, map[string]string{"error": "Failed to add task"})
 		return

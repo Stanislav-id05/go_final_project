@@ -13,7 +13,8 @@ type TasksResp struct {
 }
 
 func tasksHandler(w http.ResponseWriter, r *http.Request) {
-	tasks, err := db.Tasks(constants.TasksLimit) // запросим максимум 50 задач
+	var store db.Storage
+	tasks, err := store.Tasks(constants.TasksLimit) // запросим максимум 50 задач
 	if err != nil {
 		writeJsonError(w, err) // функция, которая возвращает ошибку в JSON
 		return

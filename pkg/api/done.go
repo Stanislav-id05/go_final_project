@@ -11,6 +11,8 @@ import (
 
 func TaskDone(w http.ResponseWriter, r *http.Request) {
 
+	var store db.Storage
+
 	idGet := r.URL.Query().Get("id")
 	if idGet == "" {
 		http.Error(w, `{"error":"Нет индентификатора"}`, http.StatusBadRequest)
@@ -23,7 +25,7 @@ func TaskDone(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := db.GetTask(strconv.Itoa(id))
+	task, err := store.GetTask(strconv.Itoa(id))
 	if err != nil {
 		http.Error(w, `{"error":"Результат поиска задачи отсутствует"}`, http.StatusNotFound)
 		return
@@ -41,12 +43,12 @@ func TaskDone(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, `{"error":"Неверный формат даты"}`, http.StatusBadRequest)
 			return
 		}
-	} else if err = db.DeleteTask(idGet); err != nil {
+	} else if err = store.DeleteTask(idGet); err != nil {
 		http.Error(w, `{"error":"Удаление невозможно"}`, http.StatusInternalServerError)
 		return
 	}
 
-	if err = db.UpdateTask(task); err != nil {
+	if err = store.UpdateTask(task); err != nil {
 		http.Error(w, `{"error":""}`, http.StatusInternalServerError)
 		return
 	}
